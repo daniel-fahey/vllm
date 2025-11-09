@@ -60,15 +60,15 @@ if(NOT GIT_FETCH_RESULT EQUAL 0)
   message(FATAL_ERROR "Failed to fetch from git repository")
 endif()
 
-# Checkout the tag
+# Checkout FETCH_HEAD (since we did a shallow fetch)
 execute_process(
-  COMMAND git checkout ${TRITON_KERNELS_TAG}
+  COMMAND git checkout FETCH_HEAD
   WORKING_DIRECTORY "${TRITON_KERNELS_SOURCE_DIR}"
   RESULT_VARIABLE GIT_CHECKOUT_RESULT
 )
 
 if(NOT GIT_CHECKOUT_RESULT EQUAL 0)
-  message(FATAL_ERROR "Failed to checkout tag ${TRITON_KERNELS_TAG}")
+  message(FATAL_ERROR "Failed to checkout FETCH_HEAD for tag ${TRITON_KERNELS_TAG}")
 endif()
 
 message(STATUS "Successfully downloaded triton_kernels using sparse checkout")
