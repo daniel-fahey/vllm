@@ -13,3 +13,7 @@ torchvision==0.24.0 # Required for phi3v processor. See https://github.com/pytor
 xformers==0.0.33+5d4b92a5.d20251029; platform_system == 'Linux' and platform_machine == 'x86_64'  # Requires PyTorch >= 2.9
 # FlashInfer should be updated together with the Dockerfile
 flashinfer-python==0.5.2
+# Triton kernels for high-performance MoE operations
+# UV users: automatically fetched from git via [tool.uv.sources] in pyproject.toml
+# pip users: install manually with `pip install git+https://github.com/triton-lang/triton.git@v3.5.0#subdirectory=python/triton_kernels`
+triton-kernels>=1.0.0

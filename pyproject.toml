@@ -303,3 +303,9 @@ windo = "windo"
 
 [tool.uv]
 no-build-isolation-package = ["torch"]
+
+[tool.uv.sources]
+# triton_kernels is an optional dependency for high-performance MoE operations
+# It's located in a subdirectory of the Triton repository, which UV can handle
+# but pip cannot (without manual installation)
+triton-kernels = { git = "https://github.com/triton-lang/triton", subdirectory = "python/triton_kernels", tag = "v3.5.0" }
