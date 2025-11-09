@@ -277,7 +277,48 @@ class cmake_build_ext(build_ext):
             ]
             subprocess.check_call(install_args, cwd=self.build_temp)
 
+    def install_triton_kernels(self):
+        """Install triton_kernels from git subdirectory before building."""
+        try:
+            # Check if triton_kernels is already installed
+            import importlib.util
+            if importlib.util.find_spec("triton_kernels") is not None:
+                logger.info("triton_kernels already installed, skipping")
+                return
+        except ImportError:
+            pass
+
+        # Check if we should skip installation
+        if os.getenv("VLLM_SKIP_TRITON_KERNELS"):
+            logger.info("VLLM_SKIP_TRITON_KERNELS set, skipping triton_kernels installation")
+            return
+
+        # Only install for CUDA/HIP builds
+        if not (_is_cuda() or _is_hip()):
+            logger.info("Not a CUDA/HIP build, skipping triton_kernels installation")
+            return
+
+        triton_kernels_url = "git+https://github.com/triton-lang/triton.git@v3.5.0#subdirectory=python/triton_kernels"
+        logger.info(f"Installing triton_kernels from {triton_kernels_url}")
+
+        try:
+            subprocess.check_call([
+                sys.executable, "-m", "pip", "install", "-q",
+                triton_kernels_url
+            ])
+            logger.info("Successfully installed triton_kernels")
+        except subprocess.CalledProcessError as e:
+            logger.warning(
+                f"Failed to install triton_kernels: {e}\n"
+                "triton_kernels is optional but provides best MoE performance.\n"
+                "You can install it manually with:\n"
+                f"  pip install {triton_kernels_url}"
+            )
+
     def run(self):
+        # Install triton_kernels before building extensions
+        self.install_triton_kernels()
+
         # First, run the standard build_ext command to compile the extensions
         super().run()
 
